@@ -333,4 +333,545 @@
           <div>
             <label class="block text-xs uppercase text-gray-400 mb-1 font-semibold">Venue</label>
             <input type="text" id="edit-venue" class="w-full bg-navy-900 border border-gray-700 rounded p-2 text-sm text-white">
-    
+          </div>
+          <div>
+            <label class="block text-xs uppercase text-gray-400 mb-1 font-semibold">Fee</label>
+            <input type="text" id="edit-fee" class="w-full bg-navy-900 border border-gray-700 rounded p-2 text-sm text-white">
+          </div>
+          <div>
+            <label class="block text-xs uppercase text-gray-400 mb-1 font-semibold">Admin Password</label>
+            <input type="text" id="edit-password" class="w-full bg-navy-900 border border-gray-700 rounded p-2 text-sm text-white">
+          </div>
+          <div class="md:col-span-4 text-right">
+            <button type="submit" class="px-6 py-2.5 bg-gold-500 text-navy-900 font-bold rounded hover:bg-gold-600 text-xs uppercase tracking-wider cursor-pointer">
+              Save Settings
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Committees Management -->
+      <div class="glass-card p-6 rounded-xl border border-gold-500/30">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-serif font-bold text-gold-400 flex items-center gap-2">
+            <i class="fa-solid fa-users"></i> Manage Committees
+          </h3>
+          <button type="button" onclick="addCommitteePrompt()" class="px-3 py-1.5 bg-burgundy-800 text-gold-400 text-xs font-semibold rounded border border-gold-500/30 cursor-pointer">
+            + Add Committee
+          </button>
+        </div>
+        <div id="admin-committee-list" class="space-y-3">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+      <!-- Resources Management -->
+      <div class="glass-card p-6 rounded-xl border border-gold-500/30">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-serif font-bold text-gold-400 flex items-center gap-2">
+            <i class="fa-solid fa-file-excel"></i> Manage Sheets & Resource Links
+          </h3>
+          <button type="button" onclick="addResourcePrompt()" class="px-3 py-1.5 bg-burgundy-800 text-gold-400 text-xs font-semibold rounded border border-gold-500/30 cursor-pointer">
+            + Add Sheet / Link
+          </button>
+        </div>
+        <div id="admin-resource-list" class="space-y-3">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+      <!-- Responses Table -->
+      <div class="glass-card p-6 rounded-xl border border-gold-500/30">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
+          <h3 class="text-lg font-serif font-bold text-gold-400 flex items-center gap-2">
+            <i class="fa-solid fa-address-book"></i> Registrations & Applications (<span id="reg-count">0</span>)
+          </h3>
+          <button type="button" onclick="exportToCSV()" class="px-4 py-2 bg-green-700 hover:bg-green-600 text-white text-xs font-bold rounded flex items-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-file-csv"></i> Export Live CSV Spreadsheet
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-gray-700 bg-navy-900 text-gray-300">
+                <th class="p-3">Category</th>
+                <th class="p-3">Applicant</th>
+                <th class="p-3">Contact</th>
+                <th class="p-3">Institution</th>
+                <th class="p-3">Committee / Dept</th>
+                <th class="p-3">Payment Proof</th>
+                <th class="p-3">Status</th>
+                <th class="p-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-registration-table" class="divide-y divide-gray-800">
+              <!-- Injected via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SCREENSHOT PREVIEW MODAL -->
+  <div id="imgModal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4" onclick="closeImgModal()">
+    <div class="relative max-w-lg w-full" onclick="event.stopPropagation()">
+      <button type="button" onclick="closeImgModal()" class="absolute -top-10 right-0 text-white text-2xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+      <img id="imgModalSrc" src="" class="w-full h-auto max-h-[80vh] object-contain rounded-lg border border-gold-500" alt="Payment Proof">
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    const ZAPIER_WEBHOOK_URL = "https://hooks.zapier.com/hooks/catch/28546568/4t377cg/";
+
+    const initialData = {
+      adminPassword: "admin123",
+      dates: "June 27–28, 2026",
+      venue: "MGSIPA, Sector 26, Chandigarh",
+      fee: "₹1,800 / Delegate",
+      committees: [
+        { id: 1, name: "UNSC (United Nations Security Council)", agenda: "Maintaining peace and security in disputed geopolitical territories." },
+        { id: 2, name: "UNHRC (Human Rights Council)", agenda: "Safeguarding human rights in areas of conflict and displacement." },
+        { id: 3, name: "DISEC (Disarmament & Int. Security)", agenda: "Addressing global disarmament and autonomous weapons risks." },
+        { id: 4, name: "AIPPM (All India Political Parties Meet)", agenda: "Deliberating electoral reforms and internal security policies." },
+        { id: 5, name: "IP (International Press)", agenda: "Journalistic reporting, photography, and press conferences." }
+      ],
+      resources: [
+        { id: 1, title: "Official Country Matrix (Google Sheet)", url: "https://docs.google.com/spreadsheets/", type: "Google Sheet" },
+        { id: 2, title: "Rules of Procedure & Delegate Handbook", url: "#", type: "PDF Guide" }
+      ],
+      registrations: []
+    };
+
+    function getAppData() {
+      try {
+        const stored = localStorage.getItem('ephemeral_mun_data');
+        if (!stored) {
+          localStorage.setItem('ephemeral_mun_data', JSON.stringify(initialData));
+          return initialData;
+        }
+        return JSON.parse(stored);
+      } catch(e) {
+        return initialData;
+      }
+    }
+
+    function saveAppData(data) {
+      try {
+        localStorage.setItem('ephemeral_mun_data', JSON.stringify(data));
+      } catch(e) {}
+      renderApp();
+    }
+
+    function renderApp() {
+      const data = getAppData();
+
+      const elDates = document.getElementById('display-dates');
+      if (elDates) elDates.innerText = data.dates;
+      
+      const elVenue = document.getElementById('display-venue');
+      if (elVenue) elVenue.innerText = data.venue;
+      
+      const elFee = document.getElementById('display-fee');
+      if (elFee) elFee.innerText = data.fee;
+      
+      const elFormFee = document.getElementById('form-fee-display');
+      if (elFormFee) elFormFee.innerText = "Fee: " + data.fee;
+
+      const commContainer = document.getElementById('committees-list');
+      const selectComm = document.getElementById('reg-committee');
+      const selectTargetComm = document.getElementById('reg-target-committee');
+      
+      if (commContainer) commContainer.innerHTML = '';
+      if (selectComm) selectComm.innerHTML = '<option value="">-- Choose a Committee --</option>';
+      if (selectTargetComm) selectTargetComm.innerHTML = '<option value="">-- Choose Target Committee --</option>';
+
+      data.committees.forEach(c => {
+        if (commContainer) {
+          commContainer.innerHTML += `
+            <div class="glass-card p-6 rounded-xl">
+              <h3 class="text-xl font-serif font-bold text-gold-400 mb-2">${c.name}</h3>
+              <p class="text-xs text-gray-300 leading-relaxed"><strong class="text-gray-400">Agenda:</strong> ${c.agenda}</p>
+            </div>
+          `;
+        }
+        if (selectComm) selectComm.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+        if (selectTargetComm) selectTargetComm.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+      });
+
+      const resContainer = document.getElementById('resources-list');
+      if (resContainer) {
+        resContainer.innerHTML = '';
+        data.resources.forEach(r => {
+          resContainer.innerHTML += `
+            <div class="bg-navy-900/90 p-4 rounded-xl border border-gray-800 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-gold-500 uppercase tracking-wider font-semibold">${r.type}</span>
+                <h4 class="text-white font-medium text-sm">${r.title}</h4>
+              </div>
+              <a href="${r.url}" target="_blank" class="px-3 py-1.5 bg-burgundy-800 hover:bg-burgundy-700 text-gold-400 text-xs rounded border border-gold-500/30 flex items-center gap-1">
+                Open Link <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+              </a>
+            </div>
+          `;
+        });
+      }
+    }
+
+    function handleRoleChange(role) {
+      const delFields = document.getElementById('delegate-fields');
+      const ocFields = document.getElementById('oc-fields');
+      const committeeRegFields = document.getElementById('committee-reg-fields');
+
+      if (delFields) delFields.classList.add('hidden');
+      if (ocFields) ocFields.classList.add('hidden');
+      if (committeeRegFields) committeeRegFields.classList.add('hidden');
+
+      if (role === 'Delegate') {
+        if (delFields) delFields.classList.remove('hidden');
+      } else if (role === 'OC') {
+        if (ocFields) ocFields.classList.remove('hidden');
+      } else if (role === 'Committee Registration') {
+        if (committeeRegFields) committeeRegFields.classList.remove('hidden');
+      }
+    }
+
+    function handleImageUpload(element) {
+      let file = element.files[0];
+      if (!file) return;
+      let reader = new FileReader();
+      reader.onloadend = function() {
+        const base64Input = document.getElementById('screenshot-base64');
+        if (base64Input) base64Input.value = reader.result;
+      }
+      reader.readAsDataURL(file);
+    }
+
+    function triggerZapierAutomation(payload) {
+      fetch(ZAPIER_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).catch(err => console.log("Webhook sync error ignored"));
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById('submit-btn');
+      if (submitBtn) {
+        submitBtn.innerText = "Processing & Syncing...";
+        submitBtn.disabled = true;
+      }
+
+      const data = getAppData();
+      const roleElement = document.getElementById('reg-role');
+      const role = roleElement ? roleElement.value : 'Delegate';
+
+      let committeeOrDeptVal = 'N/A';
+      if (role === 'Delegate') {
+        const el = document.getElementById('reg-committee');
+        committeeOrDeptVal = el ? el.value : 'N/A';
+      } else if (role === 'OC') {
+        const el = document.getElementById('reg-oc-dept');
+        committeeOrDeptVal = el ? el.value : 'N/A';
+      } else if (role === 'Committee Registration') {
+        const el = document.getElementById('reg-target-committee');
+        committeeOrDeptVal = el ? el.value : 'N/A';
+      }
+
+      const nameVal = document.getElementById('reg-name');
+      const emailVal = document.getElementById('reg-email');
+      const phoneVal = document.getElementById('reg-phone');
+      const instVal = document.getElementById('reg-institution');
+      const portVal = document.getElementById('reg-portfolio');
+      const screenVal = document.getElementById('screenshot-base64');
+
+      const newRegistration = {
+        id: Date.now(),
+        role: role,
+        name: nameVal ? nameVal.value.trim() : '',
+        email: emailVal ? emailVal.value.trim() : '',
+        phone: phoneVal ? phoneVal.value.trim() : '',
+        institution: instVal ? instVal.value.trim() : '',
+        committee: role === 'Delegate' ? committeeOrDeptVal : (role === 'Committee Registration' ? committeeOrDeptVal : 'N/A'),
+        portfolio: role === 'Delegate' ? (portVal && portVal.value.trim() ? portVal.value.trim() : 'N/A') : 'N/A',
+        ocDepartment: role === 'OC' ? committeeOrDeptVal : 'N/A',
+        screenshot: screenVal ? screenVal.value : '',
+        status: 'Unverified',
+        timestamp: new Date().toLocaleString()
+      };
+
+      data.registrations.push(newRegistration);
+      saveAppData(data);
+
+      triggerZapierAutomation({ action: "new_registration", ...newRegistration });
+
+      if (submitBtn) {
+        submitBtn.innerText = "Submit Registration";
+        submitBtn.disabled = false;
+      }
+
+      const regForm = document.getElementById('registrationForm');
+      const regSuccess = document.getElementById('registrationSuccess');
+      if (regForm) regForm.reset();
+      if (regForm) regForm.classList.add('hidden');
+      if (regSuccess) regSuccess.classList.remove('hidden');
+    }
+
+    function toggleVerifyReg(id) {
+      const data = getAppData();
+      const reg = data.registrations.find(r => r.id === id);
+      if (reg) {
+        reg.status = reg.status === 'Verified' ? 'Unverified' : 'Verified';
+        saveAppData(data);
+        renderAdminTables();
+        triggerZapierAutomation({ action: "status_update", id: reg.id, name: reg.name, status: reg.status });
+      }
+    }
+
+    function resetRegForm() {
+      const regForm = document.getElementById('registrationForm');
+      const regSuccess = document.getElementById('registrationSuccess');
+      if (regForm) regForm.classList.remove('hidden');
+      if (regSuccess) regSuccess.classList.add('hidden');
+    }
+
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      if (menu) menu.classList.toggle('hidden');
+    }
+
+    function toggleAdminModal() {
+      const modal = document.getElementById('adminLoginModal');
+      if (modal) modal.classList.toggle('hidden');
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const passInputEl = document.getElementById('admin-pass');
+      const passInput = passInputEl ? passInputEl.value : '';
+      const data = getAppData();
+      const errorEl = document.getElementById('admin-login-error');
+
+      const currentPass = data.adminPassword || 'admin123';
+
+      if (passInput === currentPass) {
+        const modal = document.getElementById('adminLoginModal');
+        if (modal) modal.classList.add('hidden');
+        if (passInputEl) passInputEl.value = '';
+        if (errorEl) errorEl.classList.add('hidden');
+        openAdminDashboard();
+      } else {
+        if (errorEl) errorEl.classList.remove('hidden');
+      }
+    }
+
+    function openAdminDashboard() {
+      const data = getAppData();
+      const dash = document.getElementById('adminDashboard');
+      if (dash) dash.classList.remove('hidden');
+
+      const edDates = document.getElementById('edit-dates');
+      const edVenue = document.getElementById('edit-venue');
+      const edFee = document.getElementById('edit-fee');
+      const edPass = document.getElementById('edit-password');
+
+      if (edDates) edDates.value = data.dates;
+      if (edVenue) edVenue.value = data.venue;
+      if (edFee) edFee.value = data.fee;
+      if (edPass) edPass.value = data.adminPassword || 'admin123';
+
+      renderAdminTables();
+    }
+
+    function closeAdminDashboard() {
+      const dash = document.getElementById('adminDashboard');
+      if (dash) dash.classList.add('hidden');
+    }
+
+    function renderAdminTables() {
+      const data = getAppData();
+
+      const adminComm = document.getElementById('admin-committee-list');
+      if (adminComm) {
+        adminComm.innerHTML = '';
+        data.committees.forEach(c => {
+          adminComm.innerHTML += `
+            <div class="bg-navy-900 p-3 rounded-lg flex justify-between items-center text-xs border border-gray-800">
+              <div>
+                <strong class="text-gold-400">${c.name}:</strong> <span class="text-gray-300">${c.agenda}</span>
+              </div>
+              <button type="button" onclick="deleteCommittee(${c.id})" class="text-red-400 hover:text-red-300 ml-4 p-1 cursor-pointer"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          `;
+        });
+      }
+
+      const adminRes = document.getElementById('admin-resource-list');
+      if (adminRes) {
+        adminRes.innerHTML = '';
+        data.resources.forEach(r => {
+          adminRes.innerHTML += `
+            <div class="bg-navy-900 p-3 rounded-lg flex justify-between items-center text-xs border border-gray-800">
+              <div>
+                <span class="text-gray-400 font-bold">[${r.type}]</span> <strong class="text-white">${r.title}</strong> - <a href="${r.url}" target="_blank" class="text-gold-400 underline">${r.url}</a>
+              </div>
+              <button type="button" onclick="deleteResource(${r.id})" class="text-red-400 hover:text-red-300 ml-4 p-1 cursor-pointer"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          `;
+        });
+      }
+
+      const regTable = document.getElementById('admin-registration-table');
+      const regCount = document.getElementById('reg-count');
+      if (regCount) regCount.innerText = data.registrations.length;
+      
+      if (regTable) {
+        regTable.innerHTML = '';
+
+        if (data.registrations.length === 0) {
+          regTable.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-gray-500">No responses recorded yet.</td></tr>`;
+          return;
+        }
+
+        data.registrations.forEach(r => {
+          const isVerified = r.status === 'Verified';
+          let detailText = `Comm: ${r.committee}`;
+          if (r.role === 'OC') {
+            detailText = `Dept: ${r.ocDepartment}`;
+          } else if (r.role === 'Committee Registration') {
+            detailText = `Target Comm: ${r.committee}`;
+          }
+
+          regTable.innerHTML += `
+            <tr class="hover:bg-navy-800/50">
+              <td class="p-3 font-bold text-gold-400">${r.role}</td>
+              <td class="p-3 font-semibold text-white">${r.name}<br><span class="text-[10px] text-gray-400 font-normal">${r.timestamp}</span></td>
+              <td class="p-3">${r.email}<br><span class="text-gray-400">${r.phone}</span></td>
+              <td class="p-3 text-gray-300">${r.institution}</td>
+              <td class="p-3"><strong class="text-gold-400">${detailText}</strong><br><span class="text-gray-400">Pref: ${r.portfolio}</span></td>
+              <td class="p-3">
+                ${r.screenshot ? `<button type="button" onclick="viewImg('${r.screenshot}')" class="text-gold-400 underline font-semibold text-[11px] cursor-pointer"><i class="fa-solid fa-image mr-1"></i> View Proof</button>` : '<span class="text-gray-500">None</span>'}
+              </td>
+              <td class="p-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isVerified ? 'bg-green-900/60 text-green-300 border border-green-700' : 'bg-red-900/60 text-red-300 border border-red-700'}">
+                  ${r.status}
+                </span>
+              </td>
+              <td class="p-3 text-right space-x-2">
+                <button type="button" onclick="toggleVerifyReg(${r.id})" class="px-2.5 py-1 ${isVerified ? 'bg-gray-700 text-gray-300' : 'bg-green-700 text-white'} rounded text-[10px] font-bold cursor-pointer">
+                  ${isVerified ? 'Unverify' : 'Verify'}
+                </button>
+                <button type="button" onclick="deleteReg(${r.id})" class="text-red-400 hover:text-red-300 p-1 cursor-pointer"><i class="fa-solid fa-trash"></i></button>
+              </td>
+            </tr>
+          `;
+        });
+      }
+    }
+
+    function saveEventDetails(e) {
+      e.preventDefault();
+      const data = getAppData();
+      const edDates = document.getElementById('edit-dates');
+      const edVenue = document.getElementById('edit-venue');
+      const edFee = document.getElementById('edit-fee');
+      const edPass = document.getElementById('edit-password');
+
+      if (edDates) data.dates = edDates.value;
+      if (edVenue) data.venue = edVenue.value;
+      if (edFee) data.fee = edFee.value;
+      if (edPass) data.adminPassword = edPass.value;
+      
+      saveAppData(data);
+      alert('Settings updated successfully!');
+    }
+
+    function addCommitteePrompt() {
+      const name = prompt('Enter Committee Name:');
+      if (!name) return;
+      const agenda = prompt('Enter Agenda for ' + name + ':');
+      if (!agenda) return;
+
+      const data = getAppData();
+      data.committees.push({ id: Date.now(), name, agenda });
+      saveAppData(data);
+      renderAdminTables();
+    }
+
+    function deleteCommittee(id) {
+      const data = getAppData();
+      data.committees = data.committees.filter(c => c.id !== id);
+      saveAppData(data);
+      renderAdminTables();
+    }
+
+    function addResourcePrompt() {
+      const title = prompt('Enter Title:');
+      if (!title) return;
+      const url = prompt('Enter Google Sheet or Document URL:');
+      if (!url) return;
+      const type = prompt('Enter Type (e.g., Google Sheet, PDF):', 'Google Sheet');
+
+      const data = getAppData();
+      data.resources.push({ id: Date.now(), title, url, type });
+      saveAppData(data);
+      renderAdminTables();
+    }
+
+    function deleteResource(id) {
+      const data = getAppData();
+      data.resources = data.resources.filter(r => r.id !== id);
+      saveAppData(data);
+      renderAdminTables();
+    }
+
+    function deleteReg(id) {
+      if (confirm('Delete this registration response?')) {
+        const data = getAppData();
+        data.registrations = data.registrations.filter(r => r.id !== id);
+        saveAppData(data);
+        renderAdminTables();
+      }
+    }
+
+    function viewImg(src) {
+      const imgModalSrc = document.getElementById('imgModalSrc');
+      const imgModal = document.getElementById('imgModal');
+      if (imgModalSrc) imgModalSrc.src = src;
+      if (imgModal) imgModal.classList.remove('hidden');
+    }
+
+    function closeImgModal() {
+      const imgModal = document.getElementById('imgModal');
+      if (imgModal) imgModal.classList.add('hidden');
+    }
+
+    function exportToCSV() {
+      const data = getAppData();
+      if (data.registrations.length === 0) return alert('No registrations to export.');
+
+      let csv = 'Role,Name,Email,Phone,Institution,Committee/Dept,Portfolio Choice,Status,Registration Date\n';
+      data.registrations.forEach(r => {
+        let deptOrComm = r.committee;
+        if (r.role === 'OC') {
+          deptOrComm = r.ocDepartment;
+        }
+        csv += `"${r.role}","${r.name}","${r.email}","${r.phone}","${r.institution}","${deptOrComm}","${r.portfolio}","${r.status}","${r.timestamp}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('href', url);
+      a.setAttribute('download', 'Ephemeral_MUN_Registrations_Live.csv');
+      a.click();
+    }
+
+    window.onload = renderApp;
+  </script>
+</body>
+</html>

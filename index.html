@@ -56,11 +56,11 @@
         </div>
       </div>
       
-      <div class="hidden md:flex space-x-8 text-sm font-medium items-center">
-        <a href="#about" class="hover:text-gold-400 transition">About</a>
-        <a href="#register" class="px-5 py-2 rounded-full bg-burgundy-800 hover:bg-burgundy-700 border border-gold-500/50 text-gold-400 font-semibold transition shadow-lg">Register Now</a>
-        <button onclick="toggleAdminModal()" class="text-gray-400 hover:text-gold-400 text-xs flex items-center gap-1.5 border border-gray-700 hover:border-gold-500/50 px-3 py-1.5 rounded-lg transition cursor-pointer">
-          <i class="fa-solid fa-lock"></i> Admin Portal
+      <div class="flex space-x-4 md:space-x-8 text-sm font-medium items-center">
+        <a href="#about" class="hover:text-gold-400 transition hidden md:inline">About</a>
+        <a href="#register" class="px-4 py-2 rounded-full bg-burgundy-800 hover:bg-burgundy-700 border border-gold-500/50 text-gold-400 font-semibold transition shadow-lg text-xs md:text-sm">Register Now</a>
+        <button type="button" onclick="openAdminModal()" class="text-gray-300 hover:text-gold-400 text-xs flex items-center gap-1.5 border border-gold-500/40 hover:border-gold-500 px-3 py-1.5 rounded-lg transition cursor-pointer bg-navy-800">
+          <i class="fa-solid fa-lock text-gold-400"></i> Admin Portal
         </button>
       </div>
     </div>
@@ -203,8 +203,7 @@
           </div>
           <div>
             <label class="block text-xs uppercase tracking-wider text-gray-300 mb-2 font-semibold">Upload Payment Proof *</label>
-            <input type="file" id="reg-screenshot" accept="image/*" required onchange="handleImageUpload(this)" class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-burgundy-800 file:text-gold-400">
-            <input type="hidden" id="screenshot-base64">
+            <input type="file" id="reg-screenshot" accept="image/*" required class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-burgundy-800 file:text-gold-400">
           </div>
         </div>
 
@@ -216,15 +215,15 @@
       <div id="registrationSuccess" class="hidden text-center py-12 space-y-4">
         <h3 class="text-2xl font-serif font-bold text-white">Submitted Successfully!</h3>
         <p class="text-gray-300 text-sm">Your application has been logged and instantly synced via Zapier to your Google Sheet.</p>
-        <button onclick="resetRegForm()" class="text-xs text-gold-400 underline cursor-pointer">Submit another application</button>
+        <button type="button" onclick="resetRegForm()" class="text-xs text-gold-400 underline cursor-pointer">Submit another application</button>
       </div>
     </div>
   </section>
 
-  <!-- ADMIN LOGIN MODAL (Display toggled correctly) -->
+  <!-- ADMIN LOGIN MODAL -->
   <div id="adminLoginModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
     <div class="glass-card max-w-md w-full p-8 rounded-2xl relative border border-gold-500/40">
-      <button onclick="toggleAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+      <button type="button" onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
       <h3 class="text-2xl font-serif font-bold text-white mb-4">Admin Access</h3>
       <form onsubmit="handleAdminLogin(event)" class="space-y-4">
         <input type="password" id="admin-pass" placeholder="Password (admin123)" required class="w-full bg-navy-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-gold-500">
@@ -238,10 +237,10 @@
     <div class="flex justify-between items-center mb-6 max-w-7xl mx-auto">
       <h2 class="text-2xl font-serif font-bold text-gold-500">Live Management Dashboard</h2>
       <div class="space-x-3">
-        <button onclick="downloadCSV()" class="px-4 py-2 bg-gold-500 text-navy-900 font-bold rounded text-xs hover:bg-gold-400 transition cursor-pointer">
+        <button type="button" onclick="downloadCSV()" class="px-4 py-2 bg-gold-500 text-navy-900 font-bold rounded text-xs hover:bg-gold-400 transition cursor-pointer">
           <i class="fa-solid fa-download mr-1"></i> Download CSV Backup
         </button>
-        <button onclick="closeAdminDashboard()" class="px-4 py-2 bg-burgundy-800 text-gold-400 rounded text-xs hover:bg-burgundy-700 cursor-pointer">Exit Admin</button>
+        <button type="button" onclick="closeAdminDashboard()" class="px-4 py-2 bg-burgundy-800 text-gold-400 rounded text-xs hover:bg-burgundy-700 cursor-pointer">Exit Admin</button>
       </div>
     </div>
 
@@ -365,16 +364,21 @@
       document.body.removeChild(link);
     }
 
-    function toggleAdminModal() { 
+    function openAdminModal() { 
       const modal = document.getElementById('adminLoginModal');
-      modal.classList.toggle('hidden'); 
+      modal.classList.remove('hidden'); 
+    }
+
+    function closeAdminModal() {
+      const modal = document.getElementById('adminLoginModal');
+      modal.classList.add('hidden');
     }
     
     function handleAdminLogin(e) {
       e.preventDefault();
       const pass = document.getElementById('admin-pass').value;
       if (pass === 'admin123') {
-        toggleAdminModal();
+        closeAdminModal();
         document.getElementById('admin-pass').value = '';
         document.getElementById('adminDashboard').classList.remove('hidden');
         renderAdminTables();
@@ -388,8 +392,4 @@
     }
 
     function renderAdminTables() {
-      const data = getAppData();
-      const regTable = document.getElementById('admin-registration-table');
-      regTable.innerHTML = '';
-
-      if (data.regis
+      const

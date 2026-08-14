@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ephemeral Events | Model United Nations</title>
+  <title>Valence Model United Nations</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -49,10 +49,10 @@
   <nav class="sticky top-0 z-40 bg-navy-900/95 backdrop-blur-md border-b border-gold-500/20 px-6 py-4">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
       <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-full bg-burgundy-800 border border-gold-500 flex items-center justify-center text-gold-500 font-serif font-bold text-xl shadow-lg">E</div>
+        <div class="w-10 h-10 rounded-full bg-burgundy-800 border border-gold-500 flex items-center justify-center text-gold-500 font-serif font-bold text-xl shadow-lg">V</div>
         <div>
-          <span class="block text-[10px] uppercase tracking-widest text-gold-500 font-semibold">Ephemeral Events</span>
-          <span class="text-lg font-serif font-bold tracking-wide text-white">Model United Nations</span>
+          <span class="block text-[10px] uppercase tracking-widest text-gold-500 font-semibold">Valence MUN</span>
+          <span class="text-lg font-serif font-bold tracking-wide text-white">Conference 2026</span>
         </div>
       </div>
       
@@ -65,6 +65,64 @@
       </div>
     </div>
   </nav>
+
+  <!-- HERO / HOME SECTION -->
+  <section id="about" class="py-20 px-6 max-w-7xl mx-auto text-center space-y-8">
+    <div class="space-y-4">
+      <span class="text-gold-500 uppercase tracking-widest text-sm font-bold">Annual Conference Session</span>
+      <h1 class="text-4xl md:text-6xl font-serif font-bold text-white tracking-wide">
+        Valence Model United Nations
+      </h1>
+      <p class="text-gray-300 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
+        Join brilliant minds for rigorous debate, diplomacy, and global problem-solving at our upcoming conference.
+      </p>
+    </div>
+
+    <!-- Date & Venue Info Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto text-left">
+      <div class="glass-card p-6 rounded-xl flex items-center space-x-4 border border-gold-500/30">
+        <div class="w-12 h-12 rounded-lg bg-burgundy-800 text-gold-400 flex items-center justify-center text-xl font-bold">
+          <i class="fa-solid fa-calendar-days"></i>
+        </div>
+        <div>
+          <span class="block text-xs uppercase text-gold-400 font-bold">Date</span>
+          <span class="text-white font-semibold text-sm">June 27–28, 2026</span>
+        </div>
+      </div>
+
+      <div class="glass-card p-6 rounded-xl flex items-center space-x-4 border border-gold-500/30">
+        <div class="w-12 h-12 rounded-lg bg-burgundy-800 text-gold-400 flex items-center justify-center text-xl font-bold">
+          <i class="fa-solid fa-location-dot"></i>
+        </div>
+        <div>
+          <span class="block text-xs uppercase text-gold-400 font-bold">Venue</span>
+          <span class="text-white font-semibold text-sm">MGSIPA, Chandigarh</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Committees Overview -->
+    <div class="pt-10">
+      <h3 class="text-2xl font-serif font-bold text-gold-400 mb-6">Featured Committees & Agendas</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+        <div class="glass-card p-6 rounded-xl space-y-2 border border-gold-500/20">
+          <span class="text-xs font-bold text-gold-500 uppercase">UNSC</span>
+          <h4 class="text-white font-bold text-base">United Nations Security Council</h4>
+          <p class="text-xs text-gray-400">Agenda: Addressing global proxy conflicts and cybersecurity threats in modern warfare.</p>
+        </div>
+        <div class="glass-card p-6 rounded-xl space-y-2 border border-gold-500/20">
+          <span class="text-xs font-bold text-gold-500 uppercase">UNHRC</span>
+          <h4 class="text-white font-bold text-base">Human Rights Council</h4>
+          <p class="text-xs text-gray-400">Agenda: Protection of refugee rights and displaced populations amidst climate crises.</p>
+        </div>
+        <div class="glass-card p-6 rounded-xl space-y-2 border border-gold-500/20">
+          <span class="text-xs font-bold text-gold-500 uppercase">AIPPM</span>
+          <h4 class="text-white font-bold text-base">All India Political Parties Meet</h4>
+          <p class="text-xs text-gray-400">Agenda: Deliberating electoral reforms and the implementation of digital democracy frameworks.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- REGISTRATION FORM -->
   <section id="register" class="py-16 px-6 max-w-4xl mx-auto">
@@ -141,7 +199,7 @@
         <div class="bg-navy-900 p-6 rounded-xl border border-gold-500/20 space-y-4">
           <div class="flex items-center justify-between border-b border-gray-800 pb-3">
             <span class="text-sm font-semibold text-gold-400"><i class="fa-solid fa-qrcode mr-2"></i> Payment Details</span>
-            <span class="text-sm font-bold text-white">UPI: ephemeral@upi</span>
+            <span class="text-sm font-bold text-white">UPI: valencemun@upi</span>
           </div>
           <div>
             <label class="block text-xs uppercase tracking-wider text-gray-300 mb-2 font-semibold">Upload Payment Proof *</label>
@@ -157,7 +215,7 @@
 
       <div id="registrationSuccess" class="hidden text-center py-12 space-y-4">
         <h3 class="text-2xl font-serif font-bold text-white">Submitted Successfully!</h3>
-        <p class="text-gray-300 text-sm">Your application and status have been dispatched to the live dashboard & Google Sheet via Zapier.</p>
+        <p class="text-gray-300 text-sm">Your application has been logged and instantly synced via Zapier to your Google Sheet.</p>
         <button onclick="resetRegForm()" class="text-xs text-gold-400 underline">Submit another application</button>
       </div>
     </div>
@@ -179,7 +237,12 @@
   <div id="adminDashboard" class="fixed inset-0 bg-navy-900 z-50 overflow-y-auto hidden p-6">
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-2xl font-serif font-bold text-gold-500">Live Management Dashboard</h2>
-      <button onclick="closeAdminDashboard()" class="px-4 py-2 bg-burgundy-800 text-gold-400 rounded">Exit Admin</button>
+      <div class="space-x-3">
+        <button onclick="downloadCSV()" class="px-4 py-2 bg-gold-500 text-navy-900 font-bold rounded text-xs hover:bg-gold-400 transition">
+          <i class="fa-solid fa-download mr-1"></i> Download CSV Backup
+        </button>
+        <button onclick="closeAdminDashboard()" class="px-4 py-2 bg-burgundy-800 text-gold-400 rounded text-xs">Exit Admin</button>
+      </div>
     </div>
 
     <div class="glass-card p-6 rounded-xl">
@@ -222,12 +285,12 @@
     }
 
     function getAppData() {
-      const stored = localStorage.getItem('ephemeral_mun_data');
+      const stored = localStorage.getItem('valencemun_data');
       return stored ? JSON.parse(stored) : { registrations: [] };
     }
 
     function saveAppData(data) {
-      localStorage.setItem('ephemeral_mun_data', JSON.stringify(data));
+      localStorage.setItem('valencemun_data', JSON.stringify(data));
       renderAdminTables();
     }
 
@@ -252,8 +315,6 @@
 
       data.registrations.push(newReg);
       saveAppData(data);
-
-      // Sync submission live to Zapier Webhook
       syncToZapier(newReg);
 
       document.getElementById('registrationForm').classList.add('hidden');
@@ -267,21 +328,41 @@
         reg.status = reg.status === 'Verified' ? 'Unverified' : 'Verified';
         reg.action = 'STATUS_UPDATE';
         saveAppData(data);
-
-        // Sync status change live to Zapier Webhook
         syncToZapier(reg);
       }
     }
 
     function syncToZapier(record) {
       if (!ZAPIER_WEBHOOK_URL) return;
-
       fetch(ZAPIER_WEBHOOK_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(record)
       }).catch(err => console.log('Zapier webhook network response error:', err));
+    }
+
+    function downloadCSV() {
+      const data = getAppData();
+      if (data.registrations.length === 0) {
+        alert('No registrations found to download.');
+        return;
+      }
+
+      let csvContent = "data:text/csv;charset=utf-8,ID,Role,Name,Email,Phone,Institution,Details,Status,Timestamp\r\n";
+      
+      data.registrations.forEach(r => {
+        let row = [r.id, r.role, `"${r.name}"`, r.email, r.phone, `"${r.institution}"`, `"${r.details}"`, r.status, `"${r.timestamp}"`];
+        csvContent += row.join(",") + "\r\n";
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "valencemun_registrations.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     function toggleAdminModal() { document.getElementById('adminLoginModal').classList.toggle('hidden'); }
@@ -311,26 +392,4 @@
             <td class="p-3">${r.email}<br><span class="text-gray-400">${r.phone}</span></td>
             <td class="p-3 text-gray-300">${r.details}</td>
             <td class="p-3">
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isVerified ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}">
-                ${r.status}
-              </span>
-            </td>
-            <td class="p-3 text-right">
-              <button onclick="toggleVerifyReg(${r.id})" class="px-3 py-1 bg-gold-500 text-navy-900 font-bold rounded text-[10px]">
-                Toggle Status
-              </button>
-            </td>
-          </tr>
-        `;
-      });
-    }
-
-    function handleImageUpload(e) {}
-    function resetRegForm() {
-      document.getElementById('registrationForm').reset();
-      document.getElementById('registrationForm').classList.remove('hidden');
-      document.getElementById('registrationSuccess').classList.add('hidden');
-    }
-  </script>
-</body>
-</html>
+ 

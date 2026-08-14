@@ -351,4 +351,400 @@
       </div>
 
       <!-- Responses Table -->
-      <div class="glass-card p-6 rounded-xl border border-
+      <div class="glass-card p-6 rounded-xl border border-gold-500/30">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
+          <h3 class="text-lg font-serif font-bold text-gold-400 flex items-center gap-2">
+            <i class="fa-solid fa-address-book"></i> Delegate Registrations (<span id="reg-count">0</span>)
+          </h3>
+          <button onclick="exportToCSV()" class="px-4 py-2 bg-green-700 hover:bg-green-600 text-white text-xs font-bold rounded flex items-center gap-2">
+            <i class="fa-solid fa-file-csv"></i> Export CSV Spreadsheet
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-gray-700 bg-navy-900 text-gray-300">
+                <th class="p-3">Delegate</th>
+                <th class="p-3">Contact</th>
+                <th class="p-3">Institution</th>
+                <th class="p-3">Committee & Preference</th>
+                <th class="p-3">Payment Proof</th>
+                <th class="p-3">Status</th>
+                <th class="p-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-registration-table" class="divide-y divide-gray-800">
+              <!-- Injected via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SCREENSHOT PREVIEW MODAL -->
+  <div id="imgModal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4" onclick="closeImgModal()">
+    <div class="relative max-w-lg w-full" onclick="event.stopPropagation()">
+      <button onclick="closeImgModal()" class="absolute -top-10 right-0 text-white text-2xl"><i class="fa-solid fa-xmark"></i></button>
+      <img id="imgModalSrc" src="" class="w-full h-auto max-h-[80vh] object-contain rounded-lg border border-gold-500">
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    // Initialize EmailJS
+    (function(){
+      emailjs.init("PUBLIC_KEY_HERE"); // Replace with EmailJS Public Key if active
+    })();
+
+    // Default 5 Committees and initial site state
+    const initialData = {
+      adminPassword: "admin123",
+      dates: "June 27–28, 2026",
+      venue: "MGSIPA, Sector 26, Chandigarh",
+      fee: "₹1,800 / Delegate",
+      committees: [
+        { id: 1, name: "UNSC (United Nations Security Council)", agenda: "Maintaining peace and security in disputed geopolitical territories." },
+        { id: 2, name: "UNHRC (Human Rights Council)", agenda: "Safeguarding human rights in areas of conflict and displacement." },
+        { id: 3, name: "DISEC (Disarmament & Int. Security)", agenda: "Addressing global disarmament and autonomous weapons risks." },
+        { id: 4, name: "AIPPM (All India Political Parties Meet)", agenda: "Deliberating electoral reforms and internal security policies." },
+        { id: 5, name: "IP (International Press)", agenda: "Journalistic reporting, photography, and press conferences." }
+      ],
+      resources: [
+        { id: 1, title: "Official Country Matrix (Google Sheet)", url: "https://docs.google.com/spreadsheets/", type: "Google Sheet" },
+        { id: 2, title: "Rules of Procedure & Delegate Handbook", url: "#", type: "PDF Guide" }
+      ],
+      registrations: []
+    };
+
+    function getAppData() {
+      try {
+        const stored = localStorage.getItem('ephemeral_mun_data');
+        if (!stored) {
+          localStorage.setItem('ephemeral_mun_data', JSON.stringify(initialData));
+          return initialData;
+        }
+        return JSON.parse(stored);
+      } catch(e) {
+        return initialData;
+      }
+    }
+
+    function saveAppData(data) {
+      localStorage.setItem('ephemeral_mun_data', JSON.stringify(data));
+      renderApp();
+    }
+
+    function renderApp() {
+      const data = getAppData();
+
+      document.getElementById('display-dates').innerText = data.dates;
+      document.getElementById('display-venue').innerText = data.venue;
+      document.getElementById('display-fee').innerText = data.fee;
+      document.getElementById('form-fee-display').innerText = "Fee: " + data.fee;
+
+      // Render Committees
+      const commContainer = document.getElementById('committees-list');
+      const selectComm = document.getElementById('reg-committee');
+      commContainer.innerHTML = '';
+      selectComm.innerHTML = '<option value="">-- Choose a Committee --</option>';
+
+      data.committees.forEach(c => {
+        commContainer.innerHTML += `
+          <div class="glass-card p-6 rounded-xl">
+            <h3 class="text-xl font-serif font-bold text-gold-400 mb-2">${c.name}</h3>
+            <p class="text-xs text-gray-300 leading-relaxed"><strong class="text-gray-400">Agenda:</strong> ${c.agenda}</p>
+          </div>
+        `;
+        selectComm.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+      });
+
+      // Render Resources
+      const resContainer = document.getElementById('resources-list');
+      resContainer.innerHTML = '';
+      data.resources.forEach(r => {
+        resContainer.innerHTML += `
+          <div class="bg-navy-900/90 p-4 rounded-xl border border-gray-800 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] text-gold-500 uppercase tracking-wider font-semibold">${r.type}</span>
+              <h4 class="text-white font-medium text-sm">${r.title}</h4>
+            </div>
+            <a href="${r.url}" target="_blank" class="px-3 py-1.5 bg-burgundy-800 hover:bg-burgundy-700 text-gold-400 text-xs rounded border border-gold-500/30 flex items-center gap-1">
+              Open Link <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            </a>
+          </div>
+          `;
+      });
+    }
+
+    function handleImageUpload(element) {
+      let file = element.files[0];
+      if (!file) return;
+      let reader = new FileReader();
+      reader.onloadend = function() {
+        document.getElementById('screenshot-base64').value = reader.result;
+      }
+      reader.readAsDataURL(file);
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById('submit-btn');
+      submitBtn.innerText = "Submitting...";
+      submitBtn.disabled = true;
+
+      const data = getAppData();
+      const newReg = {
+        id: Date.now(),
+        name: document.getElementById('reg-name').value.trim(),
+        email: document.getElementById('reg-email').value.trim(),
+        phone: document.getElementById('reg-phone').value.trim(),
+        institution: document.getElementById('reg-institution').value.trim(),
+        committee: document.getElementById('reg-committee').value,
+        portfolio: document.getElementById('reg-portfolio').value.trim() || 'N/A',
+        screenshot: document.getElementById('screenshot-base64').value || '',
+        status: 'Pending',
+        timestamp: new Date().toLocaleDateString()
+      };
+
+      data.registrations.push(newReg);
+      saveAppData(data);
+
+      // Email Notification trigger
+      const templateParams = {
+        to_email: 'mayanktech79@gmail.com',
+        delegate_name: newReg.name,
+        delegate_email: newReg.email,
+        delegate_phone: newReg.phone,
+        institution: newReg.institution,
+        committee: newReg.committee,
+        portfolio: newReg.portfolio
+      };
+
+      // Send via EmailJS if keys configured, else gracefully fall back
+      if (window.emailjs && emailjs.send) {
+        emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+          .catch(err => console.log('Email dispatch fallback:', err));
+      }
+
+      submitBtn.innerText = "Submit Delegate Registration";
+      submitBtn.disabled = false;
+
+      document.getElementById('registrationForm').reset();
+      document.getElementById('registrationForm').classList.add('hidden');
+      document.getElementById('registrationSuccess').classList.remove('hidden');
+    }
+
+    function resetRegForm() {
+      document.getElementById('registrationForm').classList.remove('hidden');
+      document.getElementById('registrationSuccess').classList.add('hidden');
+    }
+
+    function toggleMobileMenu() {
+      document.getElementById('mobileMenu').classList.toggle('hidden');
+    }
+
+    function toggleAdminModal() {
+      document.getElementById('adminLoginModal').classList.toggle('hidden');
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const passInput = document.getElementById('admin-pass').value;
+      const data = getAppData();
+
+      if (passInput === (data.adminPassword || 'admin123')) {
+        document.getElementById('adminLoginModal').classList.add('hidden');
+        document.getElementById('admin-pass').value = '';
+        document.getElementById('admin-login-error').classList.add('hidden');
+        openAdminDashboard();
+      } else {
+        document.getElementById('admin-login-error').classList.remove('hidden');
+      }
+    }
+
+    function openAdminDashboard() {
+      const data = getAppData();
+      document.getElementById('adminDashboard').classList.remove('hidden');
+
+      document.getElementById('edit-dates').value = data.dates;
+      document.getElementById('edit-venue').value = data.venue;
+      document.getElementById('edit-fee').value = data.fee;
+      document.getElementById('edit-password').value = data.adminPassword || 'admin123';
+
+      renderAdminTables();
+    }
+
+    function closeAdminDashboard() {
+      document.getElementById('adminDashboard').classList.add('hidden');
+    }
+
+    function renderAdminTables() {
+      const data = getAppData();
+
+      // Render Admin Committees
+      const adminComm = document.getElementById('admin-committee-list');
+      adminComm.innerHTML = '';
+      data.committees.forEach(c => {
+        adminComm.innerHTML += `
+          <div class="bg-navy-900 p-3 rounded-lg flex justify-between items-center text-xs border border-gray-800">
+            <div>
+              <strong class="text-gold-400">${c.name}:</strong> <span class="text-gray-300">${c.agenda}</span>
+            </div>
+            <button onclick="deleteCommittee(${c.id})" class="text-red-400 hover:text-red-300 ml-4 p-1"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        `;
+     });
+
+      // Render Admin Resources
+      const adminRes = document.getElementById('admin-resource-list');
+      adminRes.innerHTML = '';
+      data.resources.forEach(r => {
+        adminRes.innerHTML += `
+          <div class="bg-navy-900 p-3 rounded-lg flex justify-between items-center text-xs border border-gray-800">
+            <div>
+              <span class="text-gray-400 font-bold">[${r.type}]</span> <strong class="text-white">${r.title}</strong> - <a href="${r.url}" target="_blank" class="text-gold-400 underline">${r.url}</a>
+            </div>
+            <button onclick="deleteResource(${r.id})" class="text-red-400 hover:text-red-300 ml-4 p-1"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        `;
+      });
+
+      // Render Registrations
+      const regTable = document.getElementById('admin-registration-table');
+      document.getElementById('reg-count').innerText = data.registrations.length;
+      regTable.innerHTML = '';
+
+      if (data.registrations.length === 0) {
+        regTable.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-gray-500">No responses recorded yet.</td></tr>`;
+        return;
+      }
+
+      data.registrations.forEach(r => {
+        const isVerified = r.status === 'Verified';
+        regTable.innerHTML += `
+          <tr class="hover:bg-navy-800/50">
+            <td class="p-3 font-semibold text-white">${r.name}<br><span class="text-[10px] text-gray-400 font-normal">${r.timestamp}</span></td>
+            <td class="p-3">${r.email}<br><span class="text-gray-400">${r.phone}</span></td>
+            <td class="p-3 text-gray-300">${r.institution}</td>
+            <td class="p-3"><strong class="text-gold-400">${r.committee}</strong><br><span class="text-gray-400">Pref: ${r.portfolio}</span></td>
+            <td class="p-3">
+              ${r.screenshot ? `<button onclick="viewImg('${r.screenshot}')" class="text-gold-400 underline font-semibold text-[11px]"><i class="fa-solid fa-image mr-1"></i> View Proof</button>` : '<span class="text-gray-500">None</span>'}
+            </td>
+            <td class="p-3">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isVerified ? 'bg-green-900/60 text-green-300 border border-green-700' : 'bg-yellow-900/60 text-yellow-300 border border-yellow-700'}">
+                ${r.status}
+              </span>
+            </td>
+            <td class="p-3 text-right space-x-2">
+              <button onclick="toggleVerifyReg(${r.id})" class="px-2.5 py-1 ${isVerified ? 'bg-gray-700 text-gray-300' : 'bg-green-700 text-white'} rounded text-[10px] font-bold">
+                ${isVerified ? 'Unverify' : 'Verify'}
+              </button>
+              <button onclick="deleteReg(${r.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function saveEventDetails(e) {
+      e.preventDefault();
+      const data = getAppData();
+      data.dates = document.getElementById('edit-dates').value;
+      data.venue = document.getElementById('edit-venue').value;
+      data.fee = document.getElementById('edit-fee').value;
+      data.adminPassword = document.getElementById('edit-password').value;
+      saveAppData(data);
+      alert('Settings updated successfully!');
+    }
+
+    function addCommitteePrompt() {
+      const name = prompt('Enter Committee Name:');
+      if (!name) return;
+      const agenda = prompt('Enter Agenda for ' + name + ':');
+      if (!agenda) return;
+
+      const data = getAppData();
+      data.committees.push({ id: Date.now(), name, agenda });
+      saveAppData(data);
+      renderAdminTables();
+    }
+
+    function deleteCommittee(id) {
+      const data = getAppData();
+      data.committees = data.committees.filter(c => c.id !== id);
+      saveAppData(data);
+      renderAdminTables();
+    }
+
+    function addResourcePrompt() {
+      const title = prompt('Enter Title:');
+      if (!title) return;
+      const url = prompt('Enter Google Sheet or Document URL:');
+      if (!url) return;
+      const type = prompt('Enter Type (e.g., Google Sheet, PDF):', 'Google Sheet');
+
+      const data = getAppData();
+      data.resources.push({ id: Date.now(), title, url, type });
+      saveAppData(data);
+      renderAdminTables();
+    }
+
+    function deleteResource(id) {
+      const data = getAppData();
+      data.resources = data.resources.filter(r => r.id !== id);
+      saveAppData(data);
+      renderAdminTables();
+    }
+
+    function toggleVerifyReg(id) {
+      const data = getAppData();
+      const reg = data.registrations.find(r => r.id === id);
+      if (reg) {
+        reg.status = reg.status === 'Verified' ? 'Pending' : 'Verified';
+        saveAppData(data);
+        renderAdminTables();
+      }
+    }
+
+    function deleteReg(id) {
+      if (confirm('Delete this registration response?')) {
+        const data = getAppData();
+        data.registrations = data.registrations.filter(r => r.id !== id);
+        saveAppData(data);
+        renderAdminTables();
+      }
+    }
+
+    function viewImg(src) {
+      document.getElementById('imgModalSrc').src = src;
+      document.getElementById('imgModal').classList.remove('hidden');
+    }
+
+    function closeImgModal() {
+      document.getElementById('imgModal').classList.add('hidden');
+    }
+
+    function exportToCSV() {
+      const data = getAppData();
+      if (data.registrations.length === 0) return alert('No registrations to export.');
+
+      let csv = 'Name,Email,Phone,Institution,Committee,Portfolio Choice,Status,Registration Date\n';
+      data.registrations.forEach(r => {
+        csv += `"${r.name}","${r.email}","${r.phone}","${r.institution}","${r.committee}","${r.portfolio}","${r.status}","${r.timestamp}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('href', url);
+      a.setAttribute('download', 'Ephemeral_MUN_Registrations.csv');
+      a.click();
+    }
+
+    window.onload = renderApp;
+  </script>
+</body>
+</html>

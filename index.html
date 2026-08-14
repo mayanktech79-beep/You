@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Valence Model United Nations</title>
+  <title>Ephemeral Model United Nations</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -49,9 +49,9 @@
   <nav class="sticky top-0 z-40 bg-navy-900/95 backdrop-blur-md border-b border-gold-500/20 px-6 py-4">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
       <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-full bg-burgundy-800 border border-gold-500 flex items-center justify-center text-gold-500 font-serif font-bold text-xl shadow-lg">V</div>
+        <div class="w-10 h-10 rounded-full bg-burgundy-800 border border-gold-500 flex items-center justify-center text-gold-500 font-serif font-bold text-xl shadow-lg">E</div>
         <div>
-          <span class="block text-[10px] uppercase tracking-widest text-gold-500 font-semibold">Valence MUN</span>
+          <span class="block text-[10px] uppercase tracking-widest text-gold-500 font-semibold">Ephemeral MUN</span>
           <span class="text-lg font-serif font-bold tracking-wide text-white">Conference 2026</span>
         </div>
       </div>
@@ -59,7 +59,7 @@
       <div class="hidden md:flex space-x-8 text-sm font-medium items-center">
         <a href="#about" class="hover:text-gold-400 transition">About</a>
         <a href="#register" class="px-5 py-2 rounded-full bg-burgundy-800 hover:bg-burgundy-700 border border-gold-500/50 text-gold-400 font-semibold transition shadow-lg">Register Now</a>
-        <button onclick="toggleAdminModal()" class="text-gray-400 hover:text-gold-400 text-xs flex items-center gap-1.5 border border-gray-700 hover:border-gold-500/50 px-3 py-1.5 rounded-lg transition">
+        <button onclick="toggleAdminModal()" class="text-gray-400 hover:text-gold-400 text-xs flex items-center gap-1.5 border border-gray-700 hover:border-gold-500/50 px-3 py-1.5 rounded-lg transition cursor-pointer">
           <i class="fa-solid fa-lock"></i> Admin Portal
         </button>
       </div>
@@ -71,7 +71,7 @@
     <div class="space-y-4">
       <span class="text-gold-500 uppercase tracking-widest text-sm font-bold">Annual Conference Session</span>
       <h1 class="text-4xl md:text-6xl font-serif font-bold text-white tracking-wide">
-        Valence Model United Nations
+        Ephemeral Model United Nations
       </h1>
       <p class="text-gray-300 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
         Join brilliant minds for rigorous debate, diplomacy, and global problem-solving at our upcoming conference.
@@ -199,7 +199,7 @@
         <div class="bg-navy-900 p-6 rounded-xl border border-gold-500/20 space-y-4">
           <div class="flex items-center justify-between border-b border-gray-800 pb-3">
             <span class="text-sm font-semibold text-gold-400"><i class="fa-solid fa-qrcode mr-2"></i> Payment Details</span>
-            <span class="text-sm font-bold text-white">UPI: valencemun@upi</span>
+            <span class="text-sm font-bold text-white">UPI: ephemeralmun@upi</span>
           </div>
           <div>
             <label class="block text-xs uppercase tracking-wider text-gray-300 mb-2 font-semibold">Upload Payment Proof *</label>
@@ -208,7 +208,7 @@
           </div>
         </div>
 
-        <button type="submit" id="submit-btn" class="w-full py-4 rounded-xl bg-gold-500 hover:bg-gold-600 text-navy-900 font-bold text-base uppercase tracking-wider transition shadow-lg">
+        <button type="submit" id="submit-btn" class="w-full py-4 rounded-xl bg-gold-500 hover:bg-gold-600 text-navy-900 font-bold text-base uppercase tracking-wider transition shadow-lg cursor-pointer">
           Submit Application
         </button>
       </form>
@@ -216,36 +216,36 @@
       <div id="registrationSuccess" class="hidden text-center py-12 space-y-4">
         <h3 class="text-2xl font-serif font-bold text-white">Submitted Successfully!</h3>
         <p class="text-gray-300 text-sm">Your application has been logged and instantly synced via Zapier to your Google Sheet.</p>
-        <button onclick="resetRegForm()" class="text-xs text-gold-400 underline">Submit another application</button>
+        <button onclick="resetRegForm()" class="text-xs text-gold-400 underline cursor-pointer">Submit another application</button>
       </div>
     </div>
   </section>
 
-  <!-- ADMIN LOGIN MODAL -->
+  <!-- ADMIN LOGIN MODAL (Display toggled correctly) -->
   <div id="adminLoginModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-    <div class="glass-card max-w-md w-full p-8 rounded-2xl relative">
-      <button onclick="toggleAdminModal()" class="absolute top-4 right-4 text-gray-400"><i class="fa-solid fa-xmark"></i></button>
+    <div class="glass-card max-w-md w-full p-8 rounded-2xl relative border border-gold-500/40">
+      <button onclick="toggleAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
       <h3 class="text-2xl font-serif font-bold text-white mb-4">Admin Access</h3>
       <form onsubmit="handleAdminLogin(event)" class="space-y-4">
-        <input type="password" id="admin-pass" placeholder="Password (admin123)" class="w-full bg-navy-900 border border-gray-700 rounded-lg px-4 py-3 text-white">
-        <button type="submit" class="w-full py-3 bg-burgundy-800 text-gold-400 font-bold rounded-lg border border-gold-500/50">Login</button>
+        <input type="password" id="admin-pass" placeholder="Password (admin123)" required class="w-full bg-navy-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-gold-500">
+        <button type="submit" class="w-full py-3 bg-burgundy-800 text-gold-400 font-bold rounded-lg border border-gold-500/50 hover:bg-burgundy-700 cursor-pointer">Login</button>
       </form>
     </div>
   </div>
 
   <!-- ADMIN DASHBOARD -->
   <div id="adminDashboard" class="fixed inset-0 bg-navy-900 z-50 overflow-y-auto hidden p-6">
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex justify-between items-center mb-6 max-w-7xl mx-auto">
       <h2 class="text-2xl font-serif font-bold text-gold-500">Live Management Dashboard</h2>
       <div class="space-x-3">
-        <button onclick="downloadCSV()" class="px-4 py-2 bg-gold-500 text-navy-900 font-bold rounded text-xs hover:bg-gold-400 transition">
+        <button onclick="downloadCSV()" class="px-4 py-2 bg-gold-500 text-navy-900 font-bold rounded text-xs hover:bg-gold-400 transition cursor-pointer">
           <i class="fa-solid fa-download mr-1"></i> Download CSV Backup
         </button>
-        <button onclick="closeAdminDashboard()" class="px-4 py-2 bg-burgundy-800 text-gold-400 rounded text-xs">Exit Admin</button>
+        <button onclick="closeAdminDashboard()" class="px-4 py-2 bg-burgundy-800 text-gold-400 rounded text-xs hover:bg-burgundy-700 cursor-pointer">Exit Admin</button>
       </div>
     </div>
 
-    <div class="glass-card p-6 rounded-xl">
+    <div class="glass-card p-6 rounded-xl max-w-7xl mx-auto">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs border-collapse">
           <thead>
@@ -285,12 +285,12 @@
     }
 
     function getAppData() {
-      const stored = localStorage.getItem('valencemun_data');
+      const stored = localStorage.getItem('ephemeral_mun_data');
       return stored ? JSON.parse(stored) : { registrations: [] };
     }
 
     function saveAppData(data) {
-      localStorage.setItem('valencemun_data', JSON.stringify(data));
+      localStorage.setItem('ephemeral_mun_data', JSON.stringify(data));
       renderAdminTables();
     }
 
@@ -359,37 +359,37 @@
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "valencemun_registrations.csv");
+      link.setAttribute("download", "ephemeral_mun_registrations.csv");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
 
-    function toggleAdminModal() { document.getElementById('adminLoginModal').classList.toggle('hidden'); }
+    function toggleAdminModal() { 
+      const modal = document.getElementById('adminLoginModal');
+      modal.classList.toggle('hidden'); 
+    }
     
     function handleAdminLogin(e) {
       e.preventDefault();
-      if (document.getElementById('admin-pass').value === 'admin123') {
+      const pass = document.getElementById('admin-pass').value;
+      if (pass === 'admin123') {
         toggleAdminModal();
+        document.getElementById('admin-pass').value = '';
         document.getElementById('adminDashboard').classList.remove('hidden');
         renderAdminTables();
+      } else {
+        alert('Incorrect Password! Use admin123');
       }
     }
 
-    function closeAdminDashboard() { document.getElementById('adminDashboard').classList.add('hidden'); }
+    function closeAdminDashboard() { 
+      document.getElementById('adminDashboard').classList.add('hidden'); 
+    }
 
     function renderAdminTables() {
       const data = getAppData();
       const regTable = document.getElementById('admin-registration-table');
       regTable.innerHTML = '';
 
-      data.registrations.forEach(r => {
-        const isVerified = r.status === 'Verified';
-        regTable.innerHTML += `
-          <tr class="hover:bg-navy-800/50">
-            <td class="p-3 font-bold text-gold-400">${r.role}</td>
-            <td class="p-3 text-white font-semibold">${r.name}<br><span class="text-[10px] text-gray-400">${r.timestamp}</span></td>
-            <td class="p-3">${r.email}<br><span class="text-gray-400">${r.phone}</span></td>
-            <td class="p-3 text-gray-300">${r.details}</td>
-            <td class="p-3">
- 
+      if (data.regis

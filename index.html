@@ -10,7 +10,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
   <script>
     tailwind.config = {
@@ -31,11 +30,6 @@
   </script>
 
   <style>
-    .gold-gradient-text {
-      background: linear-gradient(135deg, #FFF099 0%, #D4AF37 50%, #AA7C11 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
     .glass-card {
       background: rgba(28, 37, 65, 0.85);
       backdrop-filter: blur(12px);
@@ -59,7 +53,7 @@
       <div class="flex space-x-4 md:space-x-8 text-sm font-medium items-center">
         <a href="#about" class="hover:text-gold-400 transition hidden md:inline">About</a>
         <a href="#register" class="px-4 py-2 rounded-full bg-burgundy-800 hover:bg-burgundy-700 border border-gold-500/50 text-gold-400 font-semibold transition shadow-lg text-xs md:text-sm">Register Now</a>
-        <button type="button" onclick="openAdminModal()" class="text-gray-300 hover:text-gold-400 text-xs flex items-center gap-1.5 border border-gold-500/40 hover:border-gold-500 px-3 py-1.5 rounded-lg transition cursor-pointer bg-navy-800">
+        <button id="adminPortalBtn" type="button" class="text-gray-300 hover:text-gold-400 text-xs flex items-center gap-1.5 border border-gold-500/40 hover:border-gold-500 px-3 py-1.5 rounded-lg transition cursor-pointer bg-navy-800">
           <i class="fa-solid fa-lock text-gold-400"></i> Admin Portal
         </button>
       </div>
@@ -223,9 +217,9 @@
   <!-- ADMIN LOGIN MODAL -->
   <div id="adminLoginModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
     <div class="glass-card max-w-md w-full p-8 rounded-2xl relative border border-gold-500/40">
-      <button type="button" onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+      <button id="closeAdminModalBtn" type="button" class="absolute top-4 right-4 text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
       <h3 class="text-2xl font-serif font-bold text-white mb-4">Admin Access</h3>
-      <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+      <form id="adminLoginForm" class="space-y-4">
         <input type="password" id="admin-pass" placeholder="Password (admin123)" required class="w-full bg-navy-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-gold-500">
         <button type="submit" class="w-full py-3 bg-burgundy-800 text-gold-400 font-bold rounded-lg border border-gold-500/50 hover:bg-burgundy-700 cursor-pointer">Login</button>
       </form>
@@ -240,7 +234,7 @@
         <button type="button" onclick="downloadCSV()" class="px-4 py-2 bg-gold-500 text-navy-900 font-bold rounded text-xs hover:bg-gold-400 transition cursor-pointer">
           <i class="fa-solid fa-download mr-1"></i> Download CSV Backup
         </button>
-        <button type="button" onclick="closeAdminDashboard()" class="px-4 py-2 bg-burgundy-800 text-gold-400 rounded text-xs hover:bg-burgundy-700 cursor-pointer">Exit Admin</button>
+        <button id="exitAdminBtn" type="button" class="px-4 py-2 bg-burgundy-800 text-gold-400 rounded text-xs hover:bg-burgundy-700 cursor-pointer">Exit Admin</button>
       </div>
     </div>
 
@@ -267,6 +261,49 @@
 
   <script>
     const ZAPIER_WEBHOOK_URL = 'https://hooks.zapier.com/hooks/catch/28546568/4t377cg/';
+
+    // Robust Event Listeners binding for Modals
+    document.addEventListener('DOMContentLoaded', () => {
+      const adminPortalBtn = document.getElementById('adminPortalBtn');
+      const adminLoginModal = document.getElementById('adminLoginModal');
+      const closeAdminModalBtn = document.getElementById('closeAdminModalBtn');
+      const adminLoginForm = document.getElementById('adminLoginForm');
+      const exitAdminBtn = document.getElementById('exitAdminBtn');
+      const adminDashboard = document.getElementById('adminDashboard');
+
+      if (adminPortalBtn) {
+        adminPortalBtn.addEventListener('click', () => {
+          adminLoginModal.classList.remove('hidden');
+        });
+      }
+
+      if (closeAdminModalBtn) {
+        closeAdminModalBtn.addEventListener('click', () => {
+          adminLoginModal.classList.add('hidden');
+        });
+      }
+
+      if (adminLoginForm) {
+        adminLoginForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const pass = document.getElementById('admin-pass').value;
+          if (pass === 'admin123') {
+            adminLoginModal.classList.add('hidden');
+            document.getElementById('admin-pass').value = '';
+            adminDashboard.classList.remove('hidden');
+            renderAdminTables();
+          } else {
+            alert('Incorrect Password! Use admin123');
+          }
+        });
+      }
+
+      if (exitAdminBtn) {
+        exitAdminBtn.addEventListener('click', () => {
+          adminDashboard.classList.add('hidden');
+        });
+      }
+    });
 
     function handleRoleChange(role) {
       const delFields = document.getElementById('delegate-fields');
@@ -353,43 +390,4 @@
       data.registrations.forEach(r => {
         let row = [r.id, r.role, `"${r.name}"`, r.email, r.phone, `"${r.institution}"`, `"${r.details}"`, r.status, `"${r.timestamp}"`];
         csvContent += row.join(",") + "\r\n";
-      });
-
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "ephemeral_mun_registrations.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    function openAdminModal() { 
-      const modal = document.getElementById('adminLoginModal');
-      modal.classList.remove('hidden'); 
-    }
-
-    function closeAdminModal() {
-      const modal = document.getElementById('adminLoginModal');
-      modal.classList.add('hidden');
-    }
-    
-    function handleAdminLogin(e) {
-      e.preventDefault();
-      const pass = document.getElementById('admin-pass').value;
-      if (pass === 'admin123') {
-        closeAdminModal();
-        document.getElementById('admin-pass').value = '';
-        document.getElementById('adminDashboard').classList.remove('hidden');
-        renderAdminTables();
-      } else {
-        alert('Incorrect Password! Use admin123');
-      }
-    }
-
-    function closeAdminDashboard() { 
-      document.getElementById('adminDashboard').classList.add('hidden'); 
-    }
-
-    function renderAdminTables() {
-      const
+  
